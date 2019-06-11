@@ -19,8 +19,16 @@ RUN docker-php-ext-install dom zip gd pcntl posix
 
 COPY phoronix-test-suite /tmp/phoronix-test-suite/
 
+# Install phoronix-test-suite
 RUN cd /tmp/phoronix-test-suite && \
     ./install-sh && \
     rm -r /tmp/phoronix-test-suite
 
+# Put all install/cached/result files in /mnt/pts
+# use -v for external storage
+COPY phoronix-test-suite/pts-core/static/user-config-defaults.xml /etc/phoronix-test-suite.xml
+RUN sed -i 's/~\/\.phoronix-test-suite/\/mnt\/pts/g' /etc/phoronix-test-suite.xml && \
+    mkdir -p /mnt/pts
+
 ENTRYPOINT ["/usr/bin/phoronix-test-suite"]
+CMD ["shell"]
